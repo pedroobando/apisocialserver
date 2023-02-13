@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  db:
+    image: mongo:5.0-focal
+    container_name: socialmdb
+    # restart: always
+    ports:
+      - 27022:27017
+    environment:
+      MONGODB_DATABASE: nest-social
+    volumes:
+      - ./mongo:/data/db
