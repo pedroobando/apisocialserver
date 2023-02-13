@@ -6,6 +6,8 @@
 
 Una sencilla apirestfull construida desde cero (0) en [NESTJS](https://nestjs.com/)
 
+**SOCIAL SERVER** forma parte de un MERN
+
 Es recomendable tener el cliente o **CL** de nestjs instalado de forma global, para eso utilizaremos el comando
 
 ```
