@@ -41,7 +41,21 @@ export class UserService {
       .limit(limit)
       .skip(offset)
       .sort({ firstName: 1, lastName: 1 })
-      .select(['-password', '-__v']);
+      .select(['-__v', '-password']);
+  }
+
+  async findOneId(term: string) {
+    // const _term = term.toLocaleLowerCase().trim();
+    let user: UserDocument;
+
+    // Por MongoId
+    if (!user && isValidObjectId(term)) {
+      user = await this.userModel.findById(term).select('-password');
+    }
+    // not found
+    if (!user) throw new NotFoundException(`User with id: "${term}" not found`);
+
+    return user;
   }
 
   async findOne(term: string) {
@@ -54,9 +68,10 @@ export class UserService {
     // }
 
     // Por MongoId
-    if (!user && isValidObjectId(term)) {
-      user = await this.userModel.findById(term).select('-password');
-    }
+    // if (!user && isValidObjectId(term)) {
+    //   user = await this.userModel.findById(term).select('-password');
+    // }
+    user = await this.findOneId(term);
 
     // if (!user) {
     //   user = await this.userModel.findOne({ firstName: term, lastName: term });

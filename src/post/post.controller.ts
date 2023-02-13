@@ -21,13 +21,13 @@ export class PostController {
     return this.postService.findOne(term);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
-    return this.postService.update(+id, updatePostDto);
+  @Patch(':term')
+  update(@Param('term') term: string, @Body() updatePostDto: UpdatePostDto) {
+    return this.postService.update(term, updatePostDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.postService.remove(+id);
+    return this.postService.remove(id);
   }
 }

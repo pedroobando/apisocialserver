@@ -5,7 +5,7 @@ import { InjectModel } from '@nestjs/mongoose';
 
 import { Post, PostDocument } from './entities';
 import { CreatePostDto, PaginationPostDto, UpdatePostDto } from './dto';
-import { UserDocument } from 'src/user/entities';
+
 import { UserService } from 'src/user/user.service';
 
 @Injectable()
@@ -26,7 +26,7 @@ export class PostService {
     if (!isValidObjectId(userId)) {
       throw new BadRequestException(`User id ${userId} is not valid`);
     }
-    await this.userService.findOne(userId);
+    await this.userService.findOneId(userId);
 
     try {
       const createdUser = await this.postModel.create(createPostDto);
@@ -61,40 +61,33 @@ export class PostService {
   }
 
   async findOne(term: string) {
-    // const _term = term.toLocaleLowerCase().trim();
     let post: PostDocument;
 
-    // Por no
-    // if (!isNaN(+term)) {
-    // post = await this.postModel.findOne({ email: term.toLowerCase().trim() }).select('-password');
-    // }
-
-    // Por MongoId
     if (!post && isValidObjectId(term)) {
       post = await this.postModel.findById(term);
     }
 
-    // if (!user) {
-    //   user = await this.userModel.findOne({ firstName: term, lastName: term });
-    // }
-
-    // Por Name
-    // if (!user) {
-    //   user = await this.pokemonModel.findOne({ name: term.toLowerCase().trim() });
-    // }
-
-    // not found
     if (!post) throw new NotFoundException(`Post with id no "${term}" not found`);
 
     return post;
   }
 
-  update(id: number, updatePostDto: UpdatePostDto) {
-    return `This action updates a #${id} post`;
+  async update(term: string, updatePostDto: UpdatePostDto) {
+    const updatePost = await this.findOne(term);
+    // if (updateDUserDto.email) updateUserDto.email = updateUserDto.email.toLowerCase().trim();
+
+    try {
+      await updatePost.updateOne(updatePostDto);
+      return { ...updatePost.toJSON(), ...updatePostDto };
+    } catch (error) {
+      this.handleExceptions(error);
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} post`;
+  async remove(id: string) {
+    const removePost = await this.postModel.findByIdAndDelete(id);
+    if (!removePost) throw new BadRequestException(`Post with id: ${id} not found`);
+    return removePost;
   }
 
   private handleExceptions(error: any): void {

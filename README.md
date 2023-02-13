@@ -49,7 +49,7 @@ imports: [
 
 ```
 
-# Configuracion de las [variables globales](https://docs.nestjs.com/techniques/configuration#use-module-globally) _.env_
+## Configuracion de las [variables globales](https://docs.nestjs.com/techniques/configuration#use-module-globally) _.env_
 
 archivo app.modules.ts
 
