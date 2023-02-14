@@ -127,14 +127,16 @@ export class PostService {
   }
 
   async removeComment(id: string, commentId: string) {
-    // const { userId, comment } = updatePostCmDto;
     const updatePost = await this.findOne(id);
-    // await this.userService.findOneId(userId);
 
+    const existComment = updatePost.comments.find((item) => item.id === commentId);
+    if (!existComment) {
+      throw new NotFoundException(`Comment with id ${commentId} not found`);
+    }
     try {
-      const removCmmt = updatePost.comments.filter((item) => item.id !== commentId);
+      const removCmmt = updatePost.comments.filter((item) => item.id !== existComment.id);
       await updatePost.updateOne({ id, comments: removCmmt });
-      return { ...updatePost.toJSON() };
+      return { ok: true };
     } catch (error) {
       this.handleExceptions(error);
     }

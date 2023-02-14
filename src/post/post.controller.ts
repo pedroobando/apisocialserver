@@ -40,4 +40,9 @@ export class PostController {
   createComment(@Param('id') id: string, @Body() updatePostCmDto: UpdatePostCommentDto) {
     return this.postService.createComment(id, updatePostCmDto);
   }
+
+  @Delete(':id/comment/:commentId')
+  removeComment(@Param('id') id: string, @Param('commentId') commentId: string) {
+    return this.postService.removeComment(id, commentId);
+  }
 }
