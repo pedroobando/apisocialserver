@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose, { HydratedDocument } from 'mongoose';
-import { User } from 'src/user/entities';
+import { HydratedDocument } from 'mongoose';
+// import { User } from 'src/user/entities';
 // import { User } from 'src/user/entities';
 
 export type PostDocument = HydratedDocument<Post>;
@@ -34,11 +34,13 @@ export class Post {
   @Prop({ default: '' })
   userPicturePath: string;
 
-  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }] })
-  likes: User[];
+  @Prop({
+    index: true,
+  })
+  likes: string[];
 
-  @Prop([String])
-  comments: string[];
+  @Prop()
+  comments: [{ id: string; userId: string; comment: string }];
 
   // @Prop([String])
   // friends: string[];

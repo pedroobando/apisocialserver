@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { PostService } from './post.service';
-import { CreatePostDto, PaginationPostDto, UpdatePostDto } from './dto';
+import { CreatePostDto, PaginationPostDto, UpdatePostCommentDto, UpdatePostDto } from './dto';
 
 @Controller('post')
 export class PostController {
@@ -29,5 +29,15 @@ export class PostController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.postService.remove(id);
+  }
+
+  @Get(':id/like/:userId')
+  likePost(@Param('id') id: string, @Param('userId') userId: string) {
+    return this.postService.like(id, userId);
+  }
+
+  @Post(':id/comment')
+  createComment(@Param('id') id: string, @Body() updatePostCmDto: UpdatePostCommentDto) {
+    return this.postService.createComment(id, updatePostCmDto);
   }
 }

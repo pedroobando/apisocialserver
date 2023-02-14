@@ -1,10 +1,10 @@
-import { isValidObjectId, Model } from 'mongoose';
+import { isValidObjectId, Model, Types as MTypes } from 'mongoose';
 import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
 
 import { Post, PostDocument } from './entities';
-import { CreatePostDto, PaginationPostDto, UpdatePostDto } from './dto';
+import { CreatePostDto, PaginationPostDto, UpdatePostCommentDto, UpdatePostDto } from './dto';
 
 import { UserService } from 'src/user/user.service';
 
@@ -88,6 +88,56 @@ export class PostService {
     const removePost = await this.postModel.findByIdAndDelete(id);
     if (!removePost) throw new BadRequestException(`Post with id: ${id} not found`);
     return removePost;
+  }
+
+  async like(id: string, userId: string) {
+    const updatePost = await this.findOne(id);
+    const user = await this.userService.findOneId(userId);
+
+    try {
+      let postLikes: string[] = updatePost.likes;
+
+      let isLike: string = postLikes.find((item) => item === userId);
+      if (!isLike) {
+        postLikes.push(userId);
+      } else {
+        postLikes = postLikes.filter((item) => item !== user.id);
+      }
+
+      updatePost.likes = postLikes;
+      await updatePost.updateOne({ id, likes: postLikes });
+      return { ...updatePost.toJSON() };
+    } catch (error) {
+      this.handleExceptions(error);
+    }
+  }
+
+  async createComment(id: string, updatePostCmDto: UpdatePostCommentDto) {
+    const { userId, comment } = updatePostCmDto;
+    const updatePost = await this.findOne(id);
+    await this.userService.findOneId(userId);
+
+    try {
+      updatePost.comments.push({ id: new MTypes.ObjectId().toString(), userId, comment });
+      await updatePost.updateOne({ id, comments: updatePost.comments });
+      return { ...updatePost.toJSON() };
+    } catch (error) {
+      this.handleExceptions(error);
+    }
+  }
+
+  async removeComment(id: string, commentId: string) {
+    // const { userId, comment } = updatePostCmDto;
+    const updatePost = await this.findOne(id);
+    // await this.userService.findOneId(userId);
+
+    try {
+      const removCmmt = updatePost.comments.filter((item) => item.id !== commentId);
+      await updatePost.updateOne({ id, comments: removCmmt });
+      return { ...updatePost.toJSON() };
+    } catch (error) {
+      this.handleExceptions(error);
+    }
   }
 
   private handleExceptions(error: any): void {
